@@ -6,6 +6,8 @@ git config --global usser.email ur@email.com
 
 git config --list
 
+git ls-files
+
 //help
 git help
 git <verb> --help
@@ -54,3 +56,9 @@ git log
 
 //will move a branch backwards as if the commit had never been made in the first place.
 git reset <BranchName>
+
+git remote add origin <github>
+
+git push -u origin matser (-f)
+
+git pull origin master (--allow-unrelated-histories)
