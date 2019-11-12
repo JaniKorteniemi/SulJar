@@ -15,15 +15,18 @@ namespace sulatetun_jarjestelman_projekti
 {
     public partial class Form1 : Form
     {
-        static SerialPort port = new SerialPort("COM8", 9600, Parity.None, 8, StopBits.One);
+        static SerialPort port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
+        private MySQLClient mySql = new MySQLClient();
         string[] sValues = new string[3];
+        int[] nValues = new int[3];
+
         //int vrx;
         //int vry;
         //int button;
         public Form1()
         {
             InitializeComponent();
-            
+            MySQLClient.InitDB();
         }
         
 
@@ -53,6 +56,7 @@ namespace sulatetun_jarjestelman_projekti
         {
             while(true)
             {
+                
                 backgroundWorker1.ReportProgress(0, port.ReadLine());
                 sValues = port.ReadLine().ToString().Split(' ');
                 //Thread.Sleep(10);
@@ -63,9 +67,28 @@ namespace sulatetun_jarjestelman_projekti
         private void BackgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             textBox1.Text = e.UserState.ToString();
-            textBox2.Text = sValues[0];
-            textBox3.Text = sValues[1];
-            textBox4.Text = sValues[2];
+            
+
+            stringToInt();
+            textBox2.Text = nValues[0].ToString();
+            textBox3.Text = nValues[1].ToString();
+            textBox4.Text = nValues[2].ToString();
+
+            mySql.loadMySql(nValues[0], nValues[1], nValues[2]);
+
+            textBox5.Text = mySql.getRepeats().ToString();
+        }
+
+        private int[] stringToInt()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                if (sValues == null)
+                { nValues[i] = 0; }
+                else
+                { nValues[i] = int.Parse(sValues[i]); }
+            }
+            return nValues;
         }
     }
 }
