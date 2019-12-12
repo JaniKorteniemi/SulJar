@@ -9,10 +9,10 @@ namespace sulatetun_jarjestelman_projekti
 {
     class MySQLClient
     {
-        private const String Server = "mysli.oamk.fi";
-        private const String DataBase = "opisk_t7koja01";
-        private const String UID = "t7koja01";
-        private const String Password = "SulJarR2";
+        private const String Server = "oamkprojekti.ceolfkhdezbv.us-east-1.rds.amazonaws.com";
+        private const String DataBase = "SulautetunJarjestelmanProjekti";
+        private const String UID = "admin";
+        private const String Password = "rootprojekti";
         private static MySqlConnection dbConnection;
 
         private int LastUsedID = 0;
@@ -73,13 +73,9 @@ namespace sulatetun_jarjestelman_projekti
                 if (check == true)
                 {
                     if (repeat == 0)
-                    {
-                        insertToDatabase();
-                    }
+                    {   insertToDatabase(); }
                     else
-                    {
-                        updateRepeat();
-                    }
+                    {   updateRepeat(); }
                 }
                 else
                 {
@@ -116,7 +112,7 @@ namespace sulatetun_jarjestelman_projekti
             }
             else
             {
-                return false; //FALSE
+                return true; //FALSE
             }
         }
 
