@@ -1,0 +1,163 @@
+#include "mbed.h"
+#include "MPU6050.h"
+
+//#define MID         1500//SERVO
+//#define MIN         1000
+//#define MAX         2000
+//#define STEP          50
+
+Serial pc(SERIAL_TX, SERIAL_RX);
+MPU6050 mpu(PB_9, PB_8);
+PwmOut myServo(D3);   //SERVO
+
+PwmOut Ain1(PC_0);
+PwmOut Ain2(PC_1);
+
+Timer timer;
+
+Ticker toggle_led_ticker;
+
+DigitalOut led1(LED1);
+
+void toggle_led() {
+    led1 = !led1;
+}
+
+int main() {
+    toggle_led_ticker.attach(&toggle_led, 0.1);
+    
+    //aika
+    double aikaS[2] = {0.0, 0.0};
+    
+    //kulman mittaus ja laskeminen
+    int gyroG[3];
+    float edellinenGyro[3];
+    double kulma[3] = {0.0, 0.0, 0.0};
+    double deg[2] = {0.0, 0.0};
+    double edellinenKulma[3] = {0.0, 0.0, 0.0};
+    double skaalaus1 = 0.00763126684991839;
+    //double skaalaus2 = 0.946526161692858;
+    //Ain1 = period_ms(1);
+    
+    //kiihtyvyydet ja nopeudet
+    int kiihtyvyys[3];      
+    double skaalattuKiiht;
+    double edellinenKiiht;
+    double nopeus[2] = {0.0, 0.0};
+    double nopeudenMuutos;
+    double kiihtyvyydenYhteys;
+    
+    //renkaiden kääntö
+    int kaanto; //90 astetta oiekalle = 500, 90 astetta vasemmalle = 2500, 0 astetta = 1500 //kääntö
+    //int edellinenKaanto; // kaanto
+    
+    //moottori
+    int palvelimeltaTulevatVoltit;
+    float voltitMoottorille;
+    
+    
+    timer.start();
+    timer.reset();
+    
+    while (true) {
+        
+        unsigned long ajastin = timer.read_ms();
+        aikaS[0] = ajastin * 0.001f;
+        
+ 
+        mpu.getGyroRaw(gyroG);
+        mpu.getAcceleroRaw(kiihtyvyys);
+        myServo.pulsewidth_us(kaanto);//kääntö
+        
+        kaanto = 2500; //90 astetta oiekalle = 500, 90 astetta vasemmalle = 2500, 0 astetta = 1500 //kääntö
+        palvelimeltaTulevatVoltit = 2000; //5000 = 5V
+        voltitMoottorille = palvelimeltaTulevatVoltit / 5000; // 5V = 1 = max nopeus
+        Ain1 = voltitMoottorille;
+        
+        
+        /*if(palvelimeltaTulevatVoltit > 0)
+        {
+            Ain2 = 0;
+            Ain1 = 1;
+        }*/
+        /*else if(palvelimeltaTulevatVoltit < 0)
+        {
+            Ain1.write_u16(0);
+            Ain2.write_u16(voltitMoottorille);
+        }
+        else
+        {
+            Ain1.write_u16(0);
+            Ain2.write_u16(0);
+        }*/
+        
+        kiihtyvyys[1] = kiihtyvyys[1] / 100;
+    
+        if(kiihtyvyys[1] < 4)
+        {
+            if(kiihtyvyys[1] > -4)
+            {
+                kiihtyvyys[1] = 0;
+            }
+        }
+        
+        skaalattuKiiht = kiihtyvyys[1] / 16.51376147;
+        //nopeus[0] = (skaalattuKiiht - edellinenKiiht) * (aikaS[0] - aikaS[1]);
+        
+        
+        nopeudenMuutos = kiihtyvyys[1] * (aikaS[0] - aikaS[1]); //kiihtyvyys * ajan muutos
+        
+        if(kiihtyvyys[1] > 0.00)
+        {
+            nopeus[0] = nopeus[1] + nopeudenMuutos; //edellinen nopeus + nopeuden muutos
+        }
+        
+        if(kiihtyvyys[1] < 0.00)
+        {
+            nopeus[0] = nopeus[1] - nopeudenMuutos; //edellinen nopeus + nopeuden muutos
+        }
+        
+        if(nopeus[0] == nopeus[1])
+        {
+            nopeus[0] = 0.0;
+        }
+        nopeus[0] = (nopeus[0] + nopeus[1]) / 2;
+    
+        
+        kulma[2] = edellinenKulma[2] + edellinenGyro[2] * skaalaus1 * (aikaS[0] - aikaS[1]);
+        
+        deg[0] = kulma[2] - aikaS[0];
+        
+        if(deg[0] < deg[1])
+        {
+            if(deg[1] - deg[0] < 0.61)
+            {
+                deg[0] = deg[1];
+            }
+        }
+        
+        if(deg[0] > deg[1])
+        {
+            if(deg[0] - deg[1] < 0.61)
+            {
+                deg[0] = deg[1];
+            }
+        }
+        
+        int degN = (int)deg[0];
+        degN = ((degN + 4) / 5) * 5;
+        
+        //pc.printf("%f, %f %f %i \r\n", aikaS[0], kulma[2], deg[0], degN );
+        pc.printf("%f, %f, %f \r\n", aikaS[0], skaalattuKiiht, nopeus[0]);
+        
+        aikaS[1] = aikaS[0];
+        edellinenKulma[2] = kulma[2];
+        edellinenGyro[2] = gyroG[2];//gyroG
+        deg[1] = deg[0];
+        edellinenKiiht = skaalattuKiiht;
+        nopeus[1] = nopeus[0];
+        //edellinenKaanto = kaanto; //kääntö
+        
+        wait(0.01);
+    }
+}
