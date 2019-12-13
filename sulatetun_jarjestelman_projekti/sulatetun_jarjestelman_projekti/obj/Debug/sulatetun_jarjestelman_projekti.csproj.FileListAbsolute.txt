@@ -22,3 +22,5 @@ C:\Users\jkort\Desktop\KouluHommat\SulautetunJarjestelmanProjekti\PC\sulatetun_j
 C:\Users\jkort\Desktop\KouluHommat\SulautetunJarjestelmanProjekti\PC\sulatetun_jarjestelman_projekti\sulatetun_jarjestelman_projekti\bin\Debug\Google.Protobuf.dll
 C:\Users\jkort\Desktop\KouluHommat\SulautetunJarjestelmanProjekti\PC\sulatetun_jarjestelman_projekti\sulatetun_jarjestelman_projekti\bin\Debug\MySql.Data.xml
 C:\Users\jkort\Desktop\KouluHommat\SulautetunJarjestelmanProjekti\PC\sulatetun_jarjestelman_projekti\sulatetun_jarjestelman_projekti\obj\Debug\sulatetun_jarjestelman_projekti.csproj.CopyComplete
+C:\Users\jkort\Desktop\KouluHommat\SulautetunJarjestelmanProjekti\PC\sulatetun_jarjestelman_projekti\sulatetun_jarjestelman_projekti\bin\Debug\Newtonsoft.Json.dll
+C:\Users\jkort\Desktop\KouluHommat\SulautetunJarjestelmanProjekti\PC\sulatetun_jarjestelman_projekti\sulatetun_jarjestelman_projekti\bin\Debug\Newtonsoft.Json.xml
